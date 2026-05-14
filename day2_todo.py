@@ -1,7 +1,24 @@
+import json
+
 def main():
-    startingList = []
-    startingID = 1
+    startingList = loadTasks("tasks.json")
+    startingID = max(t["id"] for t in startingList) + 1 if startingList else 1
     mainMenu(startingList, startingID)
+    saveTasks("tasks.json", startingList)
+
+def saveTasks(fileName, tasks):
+    with open(fileName, "w") as f:
+        json.dump(tasks, f, indent=2)
+
+def loadTasks(fileName):
+    try:
+        with open(fileName, "r") as f:
+            return json.load(f)
+    except(FileNotFoundError):
+        return []
+
+
+
 
 def mainMenu(taskList, id):
     while True:
@@ -38,7 +55,7 @@ def addTasks(tasks, next_id):
     return next_id + 1
 
 def listTasks(taskList):
-    if len(taskList) == 0:
+    if taskList == []:
         print("No tasks yet.")
         return
     for task in taskList:
@@ -48,7 +65,7 @@ def listTasks(taskList):
 def completeTask(taskList):
     taskNum = input("Enter task number: ")
     try:
-        int(taskNum)
+        taskNum = int(taskNum)
     except ValueError:
         print("That is not a number")
         return
@@ -63,13 +80,13 @@ def completeTask(taskList):
 def deleteTask(taskList):
     taskNum = input("Enter task number: ")
     try:
-        int(taskNum)
+        taskNum = int(taskNum)
     except ValueError:
         print("That is not a number")
         return
     for i in range(len(taskList)):
         idNumber = taskList[i]["id"]
-        if idNumber == int(taskNum):
+        if idNumber == taskNum:
             taskList.pop(i)
             return
     print("No such task exists")
